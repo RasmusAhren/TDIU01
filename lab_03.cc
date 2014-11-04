@@ -22,13 +22,30 @@ int size(const List orglist);
 int main()
 {
 
+
   List test{new List_Type{15, nullptr}};
-  cout << test->next << endl;
+  empty(test);
+  /*  cout << test->next << endl;
   delete test;
 
   int* testa{new int{16}};
   cout << *testa;
   delete testa;
-
+*/
+  delete test;
   return 0;
+}
+
+bool empty(const List orglist)
+{
+  if(orglist->next == nullptr)
+    {
+      cout << "hazza!" << endl;
+      return true;
+    }
+  else
+    {
+      cout << "aaww" << endl;
+      return false;
+    }
 }
