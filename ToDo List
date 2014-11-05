@@ -1,7 +1,7 @@
 bool insert(List & orglist,const int val);
 bool remove(List & orglist, const int val);
 X  bool empty(const List orglist);
-bool member(const List orglist, const int val);
+X  bool member(const List orglist, const int val);
 
 void print(const List orglist);
 void clear(List & orglist);
