@@ -1,9 +1,9 @@
-bool insert(List & orglist,const int val);
-bool remove(List & orglist, const int val);
+X bool insert(List & orglist,const int val);
+X bool remove(List & orglist, const int val);
 X  bool empty(const List orglist);
 X  bool member(const List orglist, const int val);
 
-void print(const List orglist);
-void clear(List & orglist);
+X void print(const List orglist);
+X void clear(List & orglist);
 
-int size(const List orglist);
+X int size(const List orglist);
