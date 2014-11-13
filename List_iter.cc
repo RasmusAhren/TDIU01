@@ -1,23 +1,13 @@
 #include "List.h"
 
-// struct List_Node
-// {
-//   int data;
-//   List next;
-// };
-
-
 bool empty(const List orglist)
 {
-  if(orglist == nullptr)
+  if(orglist == nullptr)//ITER
     {
-      // cout << "empty() = TRUE " << endl;
-      return true;
+       return true;
     }
   else
     {
-      // cout << "Data i empty(): " << orglist->data << endl;
-      // cout << "empty() = FALSE" << endl;
       return false;
     }
 }
@@ -25,20 +15,22 @@ bool empty(const List orglist)
 bool member(const List orglist, const int val)
 {
   cout << "chekcing: " << val << endl;
-  if(empty(orglist) || orglist->data > val)
+  List temp = orglist;
+
+  while(!(empty(temp) || temp->data > val))
     {
-      cout << orglist->data << endl;
-      cout << "member() = false!" << endl;
-      return false;
+      if(temp->data == val)
+	{
+	  cout << "ITER_member() = true" << endl; 
+	  return true;
+	}
+      else
+	{
+	  temp = temp->next;	  
+	}
     }
-  else if(orglist->data == val)
-    {
-      cout << "member() = true" << endl; 
-      return true;
-    }
-  else
-    cout << "omstart!" << endl;
-    return (member(orglist->next,val));
+  cout << "member() = false!" << endl;
+  return false;
 }
 
 bool remove(List & orglist, const int val)
