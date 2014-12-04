@@ -1,3 +1,7 @@
+// filerna resultat.txt	resultat2.txt  startlista.txt får man hämta på kurshemsidan.
+
+
+
 #include <iostream>
 #include <iomanip>
 #include <vector>
