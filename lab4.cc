@@ -1,7 +1,3 @@
-// filerna resultat.txt	resultat2.txt  startlista.txt får man hämta på kurshemsidan.
-
-
-
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -16,35 +12,43 @@ struct deltagare
   string name{}; 
   string surname{}; 
   string club{};
-  string result{};
+  double result{};
   List next{};
 };
 
 
+bool member(const List orglist, const int val, const double result);
+bool empty(const List orglist);
 void print(const List orglist);
 void clear(List& lista);
 void print(vector<deltagare> const & list);
 bool inmatning(ifstream& personfil, List& deltagar_lista);
 //bool inmatning(ifstream& personfil, List& deltagar_lista);
 bool rekmatning(ifstream& personfil, List& deltagar_lista);
+bool tid_inmatning(ifstream & resultfil, List& orglist);
+
 
 int main(int argc, char* argv[])
 {
-  if(argc !=2)
+  if(argc !=3)
     {
       cerr << "fel antal filer som kommandoradsargument. (Det ska vara 3 filer)"
 	   << endl;
       return 1;
     }
   string personfilnamn{argv[1]};
-  cerr << argc << endl;
-  cerr << personfilnamn << endl;
+  //  cerr << personfilnamn << endl;
   List lista{};
   ifstream ifs{personfilnamn};
 
 
   inmatning(ifs,lista);
   ifs.close();
+
+  ifs.open(argv[2]);
+  tid_inmatning(ifs,lista);  
+  //  findresult()
+
 
   print(lista);
 
@@ -56,13 +60,13 @@ int main(int argc, char* argv[])
 
 /*-------
 
-void inmatning(const string& personfil, List& deltagar_lista)
-{
+  void inmatning(const string& personfil, List& deltagar_lista)
+  {
   if(deltagar_lista != nullptr)
-    {
-      cerr << "inmatning: Deltagarlista ej tom" << endl;
-      return;
-    }
+  {
+  cerr << "inmatning: Deltagarlista ej tom" << endl;
+  return;
+  }
 
   deltagare temp{};
   
@@ -70,28 +74,28 @@ void inmatning(const string& personfil, List& deltagar_lista)
 
   ifstream ifs{personfil};
   if (!ifs)
-    {
-      cerr << "Fel i inmatning() " << endl;
-      return;
-    }
+  {
+  cerr << "Fel i inmatning() " << endl;
+  return;
+  }
 
 
   cin.ignore(9001,'/n');
     
   while(!ifs.eof())
-    {
-      ifs >> temp->start >> temp->name >> temp->surname;
-      get.line(ifs, temp->club);
+  {
+  ifs >> temp->start >> temp->name >> temp->surname;
+  get.line(ifs, temp->club);
 
-      List newtemp{new deltagare};
-      temp->next = newtemp;
-    } 
+  List newtemp{new deltagare};
+  temp->next = newtemp;
+  } 
 
   ifs.close();
   return;
-}
+  }
 
--------*/
+  -------*/
 
 bool inmatning(ifstream& personfil, List& deltagar_lista)
 {
@@ -108,20 +112,22 @@ bool inmatning(ifstream& personfil, List& deltagar_lista)
 bool rekmatning(ifstream& personfil, List& deltagar_lista)
 {
   //  cerr << "Rekmatning start: " << endl;
+  
+  personfil.peek();
   if(personfil.eof())
     {
       return true;
     }
 
-    List temp(new deltagare);
-    personfil >> temp->start >> temp->name >> temp->surname;
+  List temp(new deltagare);
+  personfil >> temp->start >> temp->name >> temp->surname;
 
-    getline(personfil, temp->club);
+  getline(personfil, temp->club);
     
-    temp->next = deltagar_lista;
-    deltagar_lista = temp;
+  temp->next = deltagar_lista;
+  deltagar_lista = temp;
 
-    return (rekmatning(personfil, temp->next));
+  return (rekmatning(personfil, temp->next));
 }
 
 void print(const List orglist)
@@ -132,7 +138,7 @@ void print(const List orglist)
     }
   else
     {
-      cout << orglist->name << ", " << flush << endl;
+      cout << orglist->name << "    " << orglist->result << endl;
       print(orglist->next);
     }
 }
@@ -148,4 +154,57 @@ void clear(List &lista)
     }
   delete lista;
   lista =  nullptr;
+}
+
+bool empty(const List orglist)
+{
+  if(orglist == nullptr)
+    {
+      return true;
+    }
+  else
+    {
+      return false;
+    }
+}
+
+bool member(const List orglist, const int start, const double result)
+{
+  if(empty(orglist))
+    {
+      //      cout << orglist->data << endl;
+      //      cerr << "member() = false!" << endl;
+      return false;
+    }
+  else if(orglist->start == start)
+    {
+      orglist->result = result;
+      
+      //    cerr << "member() = true" << endl; 
+      return true;
+    }
+  else
+    //    cout << "omstart!" << endl;
+    return (member(orglist->next,start,result));
+}
+
+bool tid_inmatning(ifstream & resultfil, List& orglist)
+{
+  int tempStart{};
+  double tempResult{};
+
+
+  resultfil.ignore(9001,'\n');
+
+  while(resultfil >> tempStart)
+    {
+      while(resultfil.peek() != '\n')
+	{
+	  resultfil >> tempResult;
+	  cerr << tempResult;
+	}
+      cerr << "tid_in skriv" << endl;
+  member(orglist, tempStart, tempResult);
+    }
+  return true;
 }
