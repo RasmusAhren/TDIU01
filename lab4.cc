@@ -26,7 +26,7 @@ bool inmatning(ifstream& personfil, List& deltagar_lista);
 //bool inmatning(ifstream& personfil, List& deltagar_lista);
 bool rekmatning(ifstream& personfil, List& deltagar_lista);
 bool tid_inmatning(ifstream & resultfil, List& orglist);
-
+bool result_sort(List& orglist, List& currentlist);
 
 int main(int argc, char* argv[])
 {
@@ -207,4 +207,46 @@ bool tid_inmatning(ifstream & resultfil, List& orglist)
   member(orglist, tempStart, tempResult);
     }
   return true;
+}
+
+bool result_sort(List& orglist, List& currentlist)
+{
+  if(empty(orglist))
+    return false;
+  else if(empty(currentlist->next))
+    return true;
+
+  if(currentlist->result > currentlist->next->result)
+    {
+      cerr << "result_sort i swap-if" << endl;
+      List temp{currentlist->next};
+      currentlist->next = currentlist->next->next;
+      temp->next = currentlist;
+      currentlist = temp;
+      return result_sort(orglist, orglist);
+    }
+  else if(currentlist->result == currentlist->next->result && currentlist->name > currentlist->next->name)
+    {
+      cerr << "result_sort i exakt samma tid else-if " << endl;
+      List temp{currentlist->next};
+      currentlist->next = currentlist->next->next;
+      temp->next = currentlist;
+      currentlist = temp;
+      return result_sort(orglist, orglist);
+    }
+  else if(currentlist->result == currentlist->next->result && currentlist->name == currentlist->next->name && currentlist->surname > currentlist->next->surname)
+    {
+      List temp{currentlist->next};
+      currentlist->next = currentlist->next->next;
+      temp->next = currentlist;
+      currentlist = temp;
+      return result_sort(orglist, orglist);
+    }
+  else
+    {
+      cerr << "result_sort i swap-else  " << currentlist->result << endl;
+      return result_sort(orglist, currentlist->next);
+    }
+
+
 }
