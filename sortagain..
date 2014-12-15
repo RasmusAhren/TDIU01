@@ -1,0 +1,295 @@
+#include <iostream>
+#include <iomanip>
+#include <vector>
+#include <fstream>
+using namespace std;
+using List = struct deltagare *;
+
+
+struct deltagare
+{
+  int start{}; 
+  string name{}; 
+  string surname{}; 
+  string club{};
+  double result{};
+  List next{};
+};
+
+
+bool member(const List orglist, const int val, const double result);
+bool empty(const List orglist);
+
+bool sort(List& orglist,List& first,int flag);
+bool insert(List & orglist,const int val);
+
+//varför två print()?
+void print(const List orglist);
+void clear(List& lista);
+//varför två print()?
+void print(vector<deltagare> const & list);
+bool inmatning(ifstream& personfil, List& deltagar_lista);
+//bool inmatning(ifstream& personfil, List& deltagar_lista);
+bool rekmatning(ifstream& personfil, List& deltagar_lista);
+bool tid_inmatning(ifstream & resultfil, List& orglist);
+
+
+int main(int argc, char* argv[])
+{
+  if(argc !=3)
+    {
+      cerr << "fel antal filer som kommandoradsargument. (Det ska vara 3 filer)"
+	   << endl;
+      return 1;
+    }
+  string personfilnamn{argv[1]};
+
+  List lista{};
+  ifstream ifs{personfilnamn};
+
+
+  inmatning(ifs,lista);
+  ifs.close();
+  ifs.open(argv[2]);
+  tid_inmatning(ifs,lista);
+
+
+  
+  cerr << endl << "Ursprungslista:  " << endl;
+  print(lista);
+  cerr << endl;
+  sort(lista,lista,0);
+  cout << endl << "Sorted List: " << endl;
+  print(lista);
+
+
+  cerr << "1: " << lista->name <<endl;
+  cerr << "2: " << lista->next->name<<endl;
+  cerr << "3: " << lista->next->next->name<<endl;
+
+  clear(lista);
+
+  return 0;
+}
+
+
+/*-------
+
+  void inmatning(const string& personfil, List& deltagar_lista)
+  {
+  if(deltagar_lista != nullptr)
+  {
+  cerr << "inmatning: Deltagarlista ej tom" << endl;
+  return;
+  }
+
+  deltagare temp{};
+  
+  cerr << " --- inmatning startar: " << endl;
+
+  ifstream ifs{personfil};
+  if (!ifs)
+  {
+  cerr << "Fel i inmatning() " << endl;
+  return;
+  }
+
+
+  cin.ignore(9001,'/n');
+    
+  while(!ifs.eof())
+  {
+  ifs >> temp->start >> temp->name >> temp->surname;
+  get.line(ifs, temp->club);
+
+  List newtemp{new deltagare};
+  temp->next = newtemp;
+  } 
+
+  ifs.close();
+  return;
+  }
+
+  -------*/
+
+bool inmatning(ifstream& personfil, List& deltagar_lista)
+{
+  if(personfil.eof())
+    {
+      return false;
+    }
+
+  personfil.ignore(9001,'\n');
+
+  return rekmatning(personfil,deltagar_lista);
+}
+
+bool rekmatning(ifstream& personfil, List& deltagar_lista)
+{
+  //  cerr << "Rekmatning start: " << endl;
+  
+  personfil.peek();
+  if(personfil.eof())
+    {
+      return true;
+    }
+
+  List temp(new deltagare);
+  personfil >> temp->start >> temp->name >> temp->surname;
+
+  getline(personfil, temp->club);
+    
+  temp->next = deltagar_lista;
+  deltagar_lista = temp;
+
+  return (rekmatning(personfil, temp->next));
+}
+
+void print(const List orglist)
+{
+  if(orglist == nullptr)
+    {
+      return;
+    }
+  else
+    {
+      cout << orglist->name << "    " << orglist->result << endl;
+      print(orglist->next);
+    }
+}
+
+
+void clear(List &lista)
+{
+  if(lista == nullptr)
+    return;
+  else if(!(lista->next == nullptr))
+    {
+      clear(lista->next);
+    }
+  delete lista;
+  lista =  nullptr;
+}
+
+bool empty(const List orglist)
+{
+  if(orglist == nullptr)
+    {
+      return true;
+    }
+  else
+    {
+      return false;
+    }
+}
+
+bool member(const List orglist, const int start, const double result)
+{
+  if(empty(orglist))
+    {
+      //      cout << orglist->data << endl;
+      //      cerr << "member() = false!" << endl;
+      return false;
+    }
+  else if(orglist->start == start)
+    {
+      orglist->result = result;
+      
+      //    cerr << "member() = true" << endl; 
+      return true;
+    }
+  else
+    //    cout << "omstart!" << endl;
+    return (member(orglist->next,start,result));
+}
+
+bool tid_inmatning(ifstream & resultfil, List& orglist)
+{
+  int tempStart{};
+  double tempResult{};
+
+
+  resultfil.ignore(9001,'\n');
+
+  while(resultfil >> tempStart)
+    {
+      while(resultfil.peek() != '\n')
+	{
+	  resultfil >> tempResult;
+	  //cerr << tempResult;
+	}
+      // cerr << "tid_in skriv" << endl;
+  member(orglist, tempStart, tempResult);
+    }
+  return true;
+}
+
+
+bool sort(List& orglist,List& first, int flag)
+{
+  cerr << "STARTING WITH: " << first->name << endl;
+  cerr << "FLAG: " << flag << endl;
+
+  if(empty(orglist->next))
+    {
+      cerr << "INGEN LIST" << endl << endl;
+      if(flag == 0)
+	{
+	  cerr << endl << "DONE?" << endl;
+	  return 0;
+	}
+      return sort(first->next, first->next,0);
+    }
+
+  if(orglist->result > orglist->next->result)
+    {
+      cerr << "STEP 2" << endl;
+
+      List tempList{new deltagare};
+      tempList-> start = orglist->next->start;
+      tempList-> name = orglist->next->name;
+      tempList-> surname = orglist->next->surname;  
+      tempList-> club = orglist->next->club;
+      tempList-> result = orglist->next->result;
+      tempList-> next = orglist;
+
+      orglist->next = orglist->next->next;
+      orglist = tempList;
+
+      cerr << "RETURNING: " << orglist->next->name << endl << endl;
+      return sort(orglist->next,first,1);
+    }
+  else
+    {
+      cerr << "STEP 3"<< endl;
+      cerr << "NOW CHECKING: " << first->next->name << endl;
+      return sort(first->next,first->next,0);
+    }
+
+
+
+  cerr << "STEP 4"<< endl;
+  return 0;
+}
+
+
+
+// bool insert(List & orglist,const int val)
+// {
+//   if(empty(orglist))
+//     {
+//       List temp{new List_Type};
+//       temp->data = val;
+//       temp->next = orglist;
+//       orglist = temp;
+//       return true;
+//     }
+//   else if(val == orglist->data)
+//     {
+//       return false;
+//     }
+//   else
+//     {
+//       return insert(orglist->next, val);
+//     }
+// }
